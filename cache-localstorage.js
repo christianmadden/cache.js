@@ -1,98 +1,72 @@
 
+// Localstorage-backed cache backend for cache.js
+// Implements a LRU (least recently used) approach to evicting data from the cache
 
-
-/* ******************************************************************************* */
-var localStorageCache = function()
+$cache.register(function()
 {
-	// Private methods
 	var supportsFeature = function(feature)
 	{
 		try
 		{
 			return feature in window && window[feature] !== null;
 		}
-		catch(e)
-		{	
-			return false;
-		}
+		catch(e){ return false; }
 	};
-	var isSupported = function(){ return supportsFeature("localStorage"); };
+	var supportsLocalStorage = function(){ return supportsFeature("localStorage"); };
 	var supportsJSON = function(){ return supportsFeature("JSON"); };
 	
-	// Public interface
 	return {
 	
 		get: function(key)
 		{
-			if(!isSupported()){ throw "This cache type is not supported: localStorage"; }
-			
-			var val = localStorage.getItem(key);
+			var value = localStorage.getItem(key);
 			
 			// Try to parse the string into JSON data
-			// We have no idea if the string is JSON data until we try to parse it (TODO: metadata?)
-			if(val && supportsJSON())
+			// We have no idea if the string is JSON data until we try to parse it
+			if(value && supportsJSON())
 			{
 				try
 				{
-					val = JSON.parse(localStorage.getItem(key));
+					value = JSON.parse(value);
 				}
-				catch(e)
-				{
-					throw e;
-				}
+				catch(e){ return value; }
 			}
-			return val;
+			return value;
 		},
-		set: function(key, val)
+		set: function(key, value)
 		{
-			if(!isSupported()){ throw "This cache type is not supported: localStorage"; }
-			
+			// Try to encode the data into a JSON string
 			if(supportsJSON())
 			{
-				try{ val = JSON.stringify(val); }
+				try{ value = JSON.stringify(value); }
 				catch(e){}
 			}
 			try
 			{
-				localStorage.setItem(key, val);
+				localStorage.setItem(key, value);
 			}
 			catch(e)
 			{
 				if(e.name === "QUOTA_EXCEEDED_ERR")
 				{
-					// TODO Remove data until this doesn't happen anymore, then store
-					// Race condition?
-					return null;
+					throw e;
 				}
 			}
 		},
 		remove: function(key)
 		{
-			if(!isSupported()){ throw "This cache type is not supported: localStorage"; }
-			try
-			{
-				localStorage.removeItem(key);
-			}
-			catch(e)
-			{
-				throw e;
-			}
+			localStorage.removeItem(key);
 		},
 		clear: function()
 		{
-			if(!isSupported()){ return false; } // TODO throw CacheNotSupported Exception?
-			{
-				try
-				{
-					localStorage.clear();
-				}
-				catch(e)
-				{
-					throw e;
-				}
-			}
+			localStorage.clear();
 		},
-		identify: function(){ return "localstorageCache"; }
+		keys: function()
+		{
+			var keys = (keys in localStorage);
+			return keys;
+		},
+		supported: function(){ return supportsLocalStorage(); },
+		type: function(){ return "localstorageCache"; }
 	}
-}();
-/* ******************************************************************************* */
+}());
