@@ -10,7 +10,7 @@ body
 	font-family: Helvetica, Arial, sans-serif;
 	background-color: #ddd;
 	color: #333;
-	font-size: 120%;
+	font-size: 90%;
 	line-height: 120%;
 	
 }
@@ -25,11 +25,11 @@ h1
 	border-bottom: 1px solid #999;
 	padding-bottom: 15px;
 }
+li { list-style: square; }
+h2 { font-size: 120%; }
+.hit { color: green; }
+.miss { color: red; }
 </style>
-
-<script>
-
-</script>
 
 </head>
 
@@ -39,11 +39,107 @@ h1
 
 	<h1>cache.js demo page</h1>
 	
+	<h2>Time: current time as a string cached for 10 seconds</h2>
 	<p>
-		Lorem ipsum
+		The time is currently: 
+		<span id="time"></span>
+		<span id="time-status"></span>
 	</p>
+	
+	<h2>Random: random number stored in a JSON object cached for 3 seconds</h2>
+	<p>
+		Random number is: 
+		<span id="random"></span>
+		<span id="random-status"></span>
+	</p>
+	
+	<h2>JSON: Flickr JSONP response cached for 60 seconds</h2>
+	<p>
+		The 12 latest photo titles from the Canon 5D pool: <span id="photos-status"></span>	
+	</p>
+	<ul id="photos"></ul>
 
 </div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js"></script> 
+<script src="cache.js"></script> 
+<script src="cache-localstorage.js"></script> 
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+	// Time string demo
+	var now = $cache.get("time");
+	if(!now)
+	{
+		$("#time-status").text("Cache miss").removeClass().addClass("miss");
+		now = new Date();
+		$cache.set("time", now, 10);
+	}
+	else
+	{
+		now = new Date(now);
+		$("#time-status").text("Cache hit").removeClass().addClass("hit");
+	}
+	$("#time").text(formatTime(now));
+	
+	// Random number JSON demo
+	var random = $cache.get("random");
+	if(!random)
+	{
+		$("#random-status").text("Cache miss").removeClass().addClass("miss");
+		random = { number: Math.random() };
+		$cache.set("random", random, 3);
+	}
+	else
+	{
+		$("#random-status").text("Cache hit").removeClass().addClass("hit");
+	}
+	$("#random").text(random.number);
+	
+	// AJAX/JSON demo
+	var photos = $cache.get("photos");
+	if(!photos)
+	{
+		$("#photos-status").text("Cache miss").removeClass().addClass("miss");
+		$.getJSON("http://api.flickr.com/services/feeds/groups_pool.gne?id=27678468@N00&lang=en-us&format=json&jsoncallback=?", function(data)
+		{
+			photos = data.items;
+			$cache.set("photos", photos, 60 * 1);
+			displayPhotos(photos);
+		});
+	}
+	else
+	{
+		$("#photos-status").text("Cache hit").removeClass().addClass("hit");
+		displayPhotos(photos);
+	}
+});
+
+function formatTime(datetime)
+{
+	var hours = datetime.getHours();
+	var minutes = datetime.getMinutes();
+	var seconds = datetime.getSeconds();
+	
+	if(minutes < 10){ minutes = "0" + minutes; }
+	if(seconds < 10){ seconds = "0" + seconds; }
+
+	return hours + ":" + minutes + ":" + seconds;
+}
+
+function displayPhotos(photos)
+{
+	var html = ["<ul>"];
+	for(var i = 0; i < photos.length; i++)
+	{
+		html.push("<li>" + photos[i].title + "</li>");	
+	}
+	html.push("</ul>");
+	html = html.join("");
+	$("#photos").append($(html));
+}
+</script>
 
 </body>
 </html>
