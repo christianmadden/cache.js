@@ -1,6 +1,5 @@
 
 // Localstorage-backed cache backend for cache.js
-// Implements a LRU (least recently used) approach to evicting data from the cache
 
 $cache.register(function()
 {
@@ -57,16 +56,12 @@ $cache.register(function()
 		{
 			localStorage.removeItem(key);
 		},
-		clear: function()
-		{
-			localStorage.clear();
-		},
 		keys: function()
 		{
 			var keys = (keys in localStorage);
 			return keys;
 		},
 		supported: function(){ return supportsLocalStorage(); },
-		type: function(){ return "localstorageCache"; }
+		type: function(){ return "localstorage"; }
 	}
 }());
