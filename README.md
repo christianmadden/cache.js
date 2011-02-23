@@ -1,11 +1,11 @@
 
 # cache.js #
 
-Cache.js is a Javascript cache that is inspired by memcached and other key/value stores.
+Cache.js is a client side Javascript cache that is inspired by memcached and other key/value stores.
 
 It can be used to cache any Javascript object, the JSON data returned by an AJAX call, for example.
 
-By default, cache.js provides a localStorage-based cache, but is extensible and can use other cache backends.
+By default, cache.js provides a localStorage-based cache backend to store data in the user's browser, but is extensible and can use other cache backends.
 
 ## Basic Usage ##
 
