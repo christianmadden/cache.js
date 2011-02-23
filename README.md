@@ -1,5 +1,5 @@
 
-### cache.js ###
+# cache.js #
 
 Cache.js is a Javascript cache that is inspired by memcached and other key/value stores.
 
@@ -24,7 +24,7 @@ The set method places a key/value pair into the cache. This key/value pair will 
 
 The get method retrieves a key/value pair by its key. If the key isn't present, or the key/value pair has expired, null is returned.
 
-# Example #
+### Example ###
 
 A basic usage pattern might look something like this:
 
@@ -39,13 +39,13 @@ A basic usage pattern might look something like this:
 This example tries to get data from the cache first. If it succeeds, the cached data is used. If there is no matching data in the cache
 (either because it hasn't been set yet or it has expired), the data is retrieved (via an AJAX call or whatever the case may be), then stored in the cache.
 
-# Metadata #
+### Metadata ###
 
 Cache.js stores two key/value pairs for each piece of data cached. The first is the data itself, which is stored normally using the key provided in set().
 The second key/value pair stores metadata for the item being stored, including its creation date, last accessed date and expiration date. The metadata 
 is managed by cache.js and does not ever need to be accessed directly.
 
-# Other Methods #
+### Other Methods ###
 
 The cache also provides these other methods:
 
